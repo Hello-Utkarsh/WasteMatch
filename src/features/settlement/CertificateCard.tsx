@@ -1,6 +1,7 @@
 import React from 'react';
-import { Award, Printer, CheckCircle2, ShieldCheck, QrCode, ExternalLink } from 'lucide-react';
+import { Award, Printer, ShieldCheck, QrCode } from 'lucide-react';
 import { CreditCertificate } from '../../mock/types';
+import { CO2_ESTIMATED_TONNES } from '../../mock/economics';
 
 interface CertificateCardProps {
   certificate: CreditCertificate;
@@ -16,11 +17,6 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({ certificate, o
       {/* Decorative top pattern ribbon */}
       <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-brand-500" />
 
-      {/* Watermark Logo Background */}
-      <div className="absolute -bottom-10 -right-10 opacity-5 pointer-events-none select-none text-emerald-900 font-display font-black text-9xl">
-        WM
-      </div>
-
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-surface-subtle">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-sm flex-shrink-0">
@@ -29,7 +25,7 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({ certificate, o
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                Verified Industrial Offset Credit
+                Diversion Certificate
               </span>
               <span className="text-xs font-mono text-ink-muted">
                 {certificate.id}
@@ -61,21 +57,21 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({ certificate, o
             <div className="p-3 rounded-xl bg-surface-subtle border border-surface-muted/60">
               <span className="text-[10px] text-ink-muted block uppercase font-bold">Avoided Emissions</span>
               <span className="text-lg font-black text-emerald-700 font-display">
-                {certificate.co2eAvoidedTonnes} t CO₂e
+                {CO2_ESTIMATED_TONNES} t CO₂e (estimated)
               </span>
             </div>
 
             <div className="p-3 rounded-xl bg-surface-subtle border border-surface-muted/60">
               <span className="text-[10px] text-ink-muted block uppercase font-bold">Standard Alignment</span>
-              <span className="text-xs font-bold text-ink-primary block truncate">
-                Verra VCS / Gold Std
+              <span className="text-xs font-bold text-ink-primary block leading-tight">
+                Verra-methodology-aligned estimate, not an issued credit.
               </span>
             </div>
 
             <div className="p-3 rounded-xl bg-surface-subtle border border-surface-muted/60">
               <span className="text-[10px] text-ink-muted block uppercase font-bold">Issued At</span>
               <span className="text-xs font-bold text-ink-primary">
-                {certificate.issuedAt}
+                22 Oct 2026, ~02:30 IST
               </span>
             </div>
           </div>
@@ -106,17 +102,16 @@ export const CertificateCard: React.FC<CertificateCardProps> = ({ certificate, o
 
           <div className="mt-3 flex items-center gap-1 text-[11px] font-bold text-status-success">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Autonomous Smart Escrow</span>
+            <span>Audit Anchored</span>
           </div>
         </div>
       </div>
 
       {/* Certificate Footer */}
       <div className="pt-4 border-t border-surface-subtle flex flex-col sm:flex-row items-center justify-between text-[11px] text-ink-muted gap-2">
-        <span>Public Ledger Proof: Base Sepolia (Simulated Execution)</span>
-        <span className="font-mono">Hash ID: {certificate.txHash.slice(0, 16)}</span>
+        <span className="font-mono">Audit Transaction ID: {certificate.txHash.slice(0, 24)}...</span>
+        <span>WasteMatch Symbiosis Verification Engine</span>
       </div>
     </div>
   );
 };
-

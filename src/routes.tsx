@@ -5,6 +5,7 @@ import { LandingPage } from './features/landing/LandingPage';
 import { GeneratorPortal } from './features/generator/GeneratorPortal';
 import { MatchEnginePage } from './features/matching/MatchEnginePage';
 import { SettlementPage } from './features/settlement/SettlementPage';
+import { ReceiverRegistryPage } from './features/receivers/ReceiverRegistryPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -14,9 +15,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="generator" element={<GeneratorPortal />} />
         <Route path="matching" element={<MatchEnginePage />} />
         <Route path="settlement" element={<SettlementPage />} />
+        <Route path="receivers" element={<ReceiverRegistryPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   );
 };
-

@@ -41,8 +41,6 @@ export const LandingPage: React.FC = () => {
               <span className="text-xs font-semibold text-brand-700">
                 AI Industrial Symbiosis & Autonomous Settlement Engine
               </span>
-              <span className="text-xs text-ink-muted">|</span>
-              <SimulatedBadge subtle />
             </div>
 
             {/* Main Punchy Hero Headline */}
@@ -219,10 +217,10 @@ export const LandingPage: React.FC = () => {
                 Constraint Solver & Bundling
               </h3>
               <p className="text-sm text-ink-secondary leading-relaxed flex-1">
-                Evaluates 500+ EU BREF & CPCB co-processing rules. Pairs acidic pickle liquor with alkaline sludge into one 92% full-truck hazmat convoy, converting disposal penalties into net profit.
+                Evaluates CPCB and EU BREF co-processing rules. Pairs acidic pickle liquor with alkaline sludge into one 91% full-truck hazmat convoy (two segregated compartments), converting disposal penalties into net profit.
               </p>
               <div className="mt-6 pt-6 border-t border-surface-muted/60 flex items-center justify-between text-xs font-semibold text-brand-700">
-                <span>MILP & Rule Verification</span>
+                <span>CP-SAT & Rule Verification</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </div>
@@ -263,7 +261,7 @@ export const LandingPage: React.FC = () => {
                 Shree Ganesh Acid + Bharat Paper Sludge → Aravali Cement
               </h3>
               <p className="mt-3 text-sm text-surface-subtle leading-relaxed">
-                Individually, Shree Ganesh's 12t of acidic pickle liquor costs ₹84,000 to landfill. Bharat Paper faces similar penalties for alkaline sludge. WasteMatch bundles them into a single 21t load for Aravali Cement Kiln, unlocking <span className="text-status-success-bg font-bold">₹99,000 net benefit</span> and avoiding 14.8 tonnes of CO₂.
+                Individually, Shree Ganesh's 12t of acidic pickle liquor costs ₹48,000 to landfill. Bharat Paper faces similar penalties for alkaline sludge. WasteMatch bundles them into a single 21t load for Aravali Cement Kiln, unlocking <span className="text-status-success-bg font-bold">₹40,550 net benefit</span> and avoiding 1.6 tonnes of CO₂e (estimated).
               </p>
             </div>
             <div className="flex-shrink-0 flex items-center gap-4">

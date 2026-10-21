@@ -33,10 +33,10 @@ export const Footer: React.FC = () => {
 
         <div className="mt-4 pt-4 border-t border-surface-muted/60 flex flex-col sm:flex-row items-center justify-between text-[11px] text-ink-muted">
           <p>
-            Designed for Live Pitch Demonstration. Offline standalone architecture.
+            Autonomous industrial symbiosis & freight co-loading decision engine.
           </p>
           <p className="mt-2 sm:mt-0">
-            Delhi NCR & North India Industrial Corridor Prototype
+            Delhi NCR & North India Industrial Corridor
           </p>
         </div>
       </div>

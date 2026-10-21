@@ -19,14 +19,14 @@ export const ChemicalRadarChart: React.FC<ChemicalRadarChartProps> = ({ classNam
     { subject: 'Iron Content', value: 95, fullMark: 100 },
     { subject: 'Chloride Load', value: 88, fullMark: 100 },
     { subject: 'Corrosivity', value: 96, fullMark: 100 },
-    { subject: 'Heavy Metals (Pb/Cr)', value: 24, fullMark: 100 },
-    { subject: 'Organic Impurities', value: 15, fullMark: 100 },
+    { subject: 'Metals (Pb/Cr)', value: 24, fullMark: 100 },
+    { subject: 'Organics', value: 15, fullMark: 100 },
   ];
 
   return (
-    <div className={`w-full h-56 flex flex-col items-center justify-center ${className}`}>
+    <div className={`w-full h-56 flex flex-col items-center justify-center p-1 ${className}`}>
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
+        <RadarChart cx="50%" cy="50%" outerRadius="62%" data={data} margin={{ top: 10, right: 25, bottom: 10, left: 25 }}>
           <PolarGrid stroke="#EBE7E4" />
           <PolarAngleAxis
             dataKey="subject"
@@ -45,4 +45,3 @@ export const ChemicalRadarChart: React.FC<ChemicalRadarChartProps> = ({ classNam
     </div>
   );
 };
-

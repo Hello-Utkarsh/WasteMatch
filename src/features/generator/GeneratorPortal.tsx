@@ -33,11 +33,14 @@ export const GeneratorPortal: React.FC = () => {
     addSampleFiles,
     runAnalysis,
     updateParameter,
+    requestPartnerLab,
+    simulateLabResult,
   } = useDemoStore();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingParamKey, setEditingParamKey] = useState<string | null>(null);
   const [editParamVal, setEditParamVal] = useState<string>('');
+  const [labRequestedToast, setLabRequestedToast] = useState(false);
 
   const inputTiles: {
     id: string;
@@ -146,10 +149,6 @@ export const GeneratorPortal: React.FC = () => {
           <p className="text-sm text-ink-secondary mt-1">
             Generator: <strong className="text-ink-primary">Shree Ganesh Galvanizers</strong> (Ghaziabad, UP) • Steel Descaling Byproduct
           </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <SimulatedBadge />
         </div>
       </div>
 
@@ -372,6 +371,85 @@ export const GeneratorPortal: React.FC = () => {
                 </div>
               </div>
 
+              {/* Data Completeness Strip (Task 6) */}
+              <div className="mb-6 p-4 rounded-2xl bg-surface-subtle/70 border border-surface-muted">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 block mb-0.5">
+                      Data Completeness & Tier Validation
+                    </span>
+                    <h4 className="text-xs sm:text-sm font-bold text-ink-primary">
+                      10 of 12 key parameters measured · 2 flagged for verification
+                    </h4>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {fingerprint.status === 'Provisional' ? (
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                          Provisional: Pending Lab Test
+                        </span>
+                        <button
+                          onClick={async () => {
+                            await simulateLabResult();
+                          }}
+                          className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-colors"
+                        >
+                          Simulate Lab Result (Confirm)
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={async () => {
+                          await requestPartnerLab();
+                          setLabRequestedToast(true);
+                          setTimeout(() => setLabRequestedToast(false), 4000);
+                        }}
+                        className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface border border-surface-muted hover:border-brand-300 text-ink-primary hover:text-brand-700 transition-colors shadow-subtle"
+                      >
+                        Request Partner-Lab Test
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3-Step Tier Progress Bar */}
+                <div className="grid grid-cols-3 gap-2 my-2 text-center text-[11px]">
+                  <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                    ✓ Tier 0: Process + photo
+                  </div>
+                  <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-900 font-bold border border-emerald-300 ring-1 ring-emerald-400">
+                    ● Tier 1: Quick on-site checks (Current)
+                  </div>
+                  <div className={`p-1.5 rounded-lg border transition-colors ${
+                    fingerprint.status === 'Confirmed'
+                      ? 'bg-emerald-50 text-emerald-800 font-bold border-emerald-200'
+                      : 'bg-surface text-ink-muted border-surface-muted'
+                  }`}>
+                    {fingerprint.status === 'Confirmed' ? '✓ Tier 2: Lab test' : 'Tier 2: Lab test'}
+                  </div>
+                </div>
+
+                {/* Callout */}
+                <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 mt-3 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold">Tests needed to unlock matches:</span> chloride titration, zinc (XRF). 2 of 50 parameters, not the full panel.
+                  </div>
+                </div>
+
+                {labRequestedToast && (
+                  <div className="mt-2 text-xs font-semibold text-emerald-700 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
+                    ✓ Lab test requested (simulated). Matches set to provisional status.
+                  </div>
+                )}
+
+                {/* Footnote */}
+                <p className="text-[11px] text-ink-muted mt-2">
+                  WasteMatch is decision support. Final acceptance rests on the receiver's pre-acceptance test and authorisation.
+                </p>
+              </div>
+
               {/* 12 Key Parameter Grid */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
@@ -455,7 +533,7 @@ export const GeneratorPortal: React.FC = () => {
               {/* Action Nav to Screen 2 */}
               <div className="pt-6 border-t border-surface-subtle flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-xs text-ink-secondary">
-                  Ready for constraint solver • 4 possible receivers within 500km
+                  Ready for constraint solver • 4 possible receivers within 1,000 km
                 </div>
 
                 <button

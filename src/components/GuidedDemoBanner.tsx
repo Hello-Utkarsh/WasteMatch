@@ -17,18 +17,20 @@ export const GuidedDemoBanner: React.FC = () => {
     selectMatch,
     simulateDeliveryTransit,
     runVerificationCheck,
-    releaseEscrowPayment,
+    releaseStage1,
+    simulateLabReport,
+    releaseStage2,
     matches,
   } = useDemoStore();
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Guided demo scenario steps
+  // Guided demo scenario steps (Task 7)
   const DEMO_STAGES = [
     {
       index: 0,
-      title: '1. Ingestion: Loading multimodal waste reports',
-      caption: 'Step 1/6: Loading SGS lab assay, storage vat photos, NIR scan, and shift supervisor voice logs for Shree Ganesh Galvanizers.',
+      title: '1. Ingestion: Multimodal waste inputs',
+      caption: 'Step 1/7: Loading SGS lab assay, storage vat photos, NIR scan, and shift supervisor voice logs for Shree Ganesh Galvanizers.',
       duration: 3500,
       action: async () => {
         navigate('/generator');
@@ -37,9 +39,9 @@ export const GuidedDemoBanner: React.FC = () => {
     },
     {
       index: 1,
-      title: '2. Fingerprinting: Multimodal AI synthesis',
-      caption: 'Step 2/6: Extracting 50 chemical & safety parameters with confidence ratings (pH 0.85, high Fe, Cl, Corrosive Class 8).',
-      duration: 5000,
+      title: '2. Fingerprinting: Chemical passport & completeness',
+      caption: 'Step 2/7: Multimodal AI extracts key chemical parameters with Tier 1 on-site completeness and Human-in-the-Loop verification.',
+      duration: 4500,
       action: async () => {
         navigate('/generator');
         await runAnalysis();
@@ -47,8 +49,17 @@ export const GuidedDemoBanner: React.FC = () => {
     },
     {
       index: 2,
-      title: '3. Constraint Solver: Finding symbiosis partners',
-      caption: 'Step 3/6: Navigating to Optimization Engine. Querying 500+ EU BREF & CPCB environmental regulations across Delhi NCR.',
+      title: '3. Receiver Registry: SPCB Public Index',
+      caption: 'Step 3/7: Receivers come from public SPCB/CPCB registries, then claim their profile and complete quality envelope specs.',
+      duration: 4500,
+      action: async () => {
+        navigate('/receivers');
+      },
+    },
+    {
+      index: 3,
+      title: '4. Optimization: CP-SAT Constraint Solver',
+      caption: 'Step 4/7: CP-SAT solver evaluates feasibility across CPCB & EU BREF rules with multi-stop vehicle sequencing.',
       duration: 4500,
       action: async () => {
         navigate('/matching');
@@ -56,10 +67,10 @@ export const GuidedDemoBanner: React.FC = () => {
       },
     },
     {
-      index: 3,
-      title: '4. Hero Bundle: Co-loading acidic + alkaline wastes',
-      caption: 'Step 4/6: Breakout moment! Acidic pickle liquor (12t) + alkaline sludge (9t) bundled into one full ADR truck for Aravali Cement.',
-      duration: 5000,
+      index: 4,
+      title: '5. The Shared Bundle: 91% Full Tanker',
+      caption: 'Step 5/7: Two half-empty loads become one 91% full tanker (Muzaffarnagar 9t + Ghaziabad 12t to Aravali Kiln). Net benefit: ₹40,550.',
+      duration: 4500,
       action: async () => {
         navigate('/matching');
         if (matches.length > 0) {
@@ -68,25 +79,29 @@ export const GuidedDemoBanner: React.FC = () => {
       },
     },
     {
-      index: 4,
-      title: '5. Settle Engine: Smart contract escrow & IoT transit',
-      caption: 'Step 5/6: Escrow locked at ₹99,000 net benefit. GPS & tamper-evident temperature seals monitor the 420km transit.',
-      duration: 4500,
+      index: 5,
+      title: '6. Settlement & Transit: 820 km Road Milestones',
+      caption: 'Step 6/7: Receiver payment of ₹26,250 held in escrow. Vehicle GPS & E-seals monitored across 820 km to Gate #4.',
+      duration: 4000,
       action: async () => {
         navigate('/settlement');
         await simulateDeliveryTransit();
       },
     },
     {
-      index: 5,
-      title: '6. Verification: Autonomous settlement & carbon credit',
-      caption: 'Step 6/6: Delivery arrived at Kiln Gate #4. AI test-strip verifies pH & metals. Payment auto-releases and Carbon Credit minted!',
+      index: 6,
+      title: '7. Staged Verification: Payout & Diversion Certificate',
+      caption: 'Step 7/7: Gate checks pass (Stage 1 released: ₹21,000). Lab report verified (Stage 2 released: ₹5,250). Diversion Certificate issued!',
       duration: 5500,
       action: async () => {
         navigate('/settlement');
         await runVerificationCheck();
-        await new Promise((r) => setTimeout(r, 1200));
-        await releaseEscrowPayment();
+        await new Promise((r) => setTimeout(r, 600));
+        await releaseStage1();
+        await new Promise((r) => setTimeout(r, 600));
+        await simulateLabReport();
+        await new Promise((r) => setTimeout(r, 600));
+        await releaseStage2();
       },
     },
   ];
@@ -99,20 +114,17 @@ export const GuidedDemoBanner: React.FC = () => {
       return;
     }
 
-    // Execute current stage action
     if (currentStage && currentStage.action) {
       currentStage.action();
     }
 
-    // Schedule next stage
     timerRef.current = setTimeout(() => {
       if (guidedDemo.stepIndex < DEMO_STAGES.length - 1) {
         nextGuidedDemoStep();
       } else {
-        // Finished all steps
         stopGuidedDemo();
       }
-    }, currentStage?.duration || 4000);
+    }, currentStage?.duration || 4500);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -206,4 +218,3 @@ export const GuidedDemoBanner: React.FC = () => {
     </div>
   );
 };
-

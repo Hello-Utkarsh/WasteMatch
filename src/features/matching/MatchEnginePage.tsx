@@ -2,25 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Cpu,
-  Layers,
   Sparkles,
   ArrowRight,
   ShieldCheck,
-  CheckCircle2,
-  TrendingUp,
-  Truck,
   RotateCcw,
-  SlidersHorizontal,
-  ChevronRight,
-  Info,
-  Scale,
+  Truck,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
 import { useDemoStore } from '../../store/demoStore';
 import { NetworkMapSvg } from './NetworkMapSvg';
 import { BaselineComparisonChart } from './BaselineComparisonChart';
 import { CompatibilityDetailDrawer } from './CompatibilityDetailDrawer';
 import { ReceiverView } from './ReceiverView';
-import { SimulatedBadge } from '../../components/SimulatedBadge';
 import { MatchOption } from '../../mock/types';
 
 export const MatchEnginePage: React.FC = () => {
@@ -35,6 +29,8 @@ export const MatchEnginePage: React.FC = () => {
     setActiveMatchTab,
     runOptimizer,
     selectMatch,
+    fingerprint,
+    simulateLabResult,
   } = useDemoStore();
 
   const [detailModalMatch, setDetailModalMatch] = useState<MatchOption | null>(null);
@@ -50,6 +46,8 @@ export const MatchEnginePage: React.FC = () => {
     navigate('/settlement');
   };
 
+  const isProvisional = fingerprint?.status === 'Provisional';
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Header */}
@@ -64,7 +62,7 @@ export const MatchEnginePage: React.FC = () => {
             Symbiosis Matching & Route Optimization
           </h1>
           <p className="text-sm text-ink-secondary mt-1">
-            Analyzing compatibility across 500+ EU BREF & CPCB rules with multi-depot hazmat vehicle routing.
+            Rule engine: sample rule set in this prototype
           </p>
         </div>
 
@@ -92,7 +90,6 @@ export const MatchEnginePage: React.FC = () => {
               Receiver Kiln Perspective
             </button>
           </div>
-          <SimulatedBadge />
         </div>
       </div>
 
@@ -109,19 +106,33 @@ export const MatchEnginePage: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-ink-primary">
-                  MILP Constraint Solver Status
+                  CP-SAT Solver Status
                 </h3>
                 <p className="text-xs text-ink-secondary">
                   {isSolving
                     ? solverProgress.label
                     : hasSolved
-                    ? 'Global Pareto-optimal bundle identified • 3 feasible configurations'
+                    ? 'Best feasible bundle found · 3 configurations evaluated'
                     : 'Awaiting solver execution'}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
+              {/* Task 6: Simulate lab result button if provisional */}
+              {isProvisional && (
+                <button
+                  onClick={async () => {
+                    await simulateLabResult();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-300 transition-colors shadow-sm"
+                  title="Simulate lab test completion to confirm matches"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Simulate Lab Result</span>
+                </button>
+              )}
+
               {isSolving ? (
                 <div className="w-48">
                   <div className="flex justify-between text-[11px] font-mono text-brand-700 mb-1">
@@ -159,9 +170,6 @@ export const MatchEnginePage: React.FC = () => {
                       Multi-Party Spatial Symbiosis Network
                     </h3>
                   </div>
-                  <span className="text-[11px] text-ink-muted">
-                    Offline SVG Coordinate Engine
-                  </span>
                 </div>
 
                 {/* The SVG Network Map */}
@@ -173,20 +181,10 @@ export const MatchEnginePage: React.FC = () => {
                   />
                 </div>
 
-                {/* Hero Story Explainer Callout */}
-                {selectedMatch?.id === 'match-opt-1' && (
-                  <div className="mt-4 p-4 rounded-2xl bg-brand-50/70 border border-brand-200 flex items-start gap-3">
-                    <Layers className="w-5 h-5 text-brand-600 flex-shrink-0 mt-0.5" />
-                    <div className="text-xs">
-                      <strong className="text-brand-900 font-bold block mb-0.5">
-                        Breakout Moment: Multi-Party Co-loading Solved
-                      </strong>
-                      <p className="text-brand-800 leading-relaxed">
-                        Shree Ganesh's 12t of acidic liquor alone cannot justify a ₹60k tanker freight to Rajasthan. WasteMatch bundles it with <strong>Bharat Paper's 9t alkaline sludge</strong> from Muzaffarnagar into a single dual-vessel tanker, reaching <strong>92% truck fill</strong> and making the entire trip highly profitable.
-                      </p>
-                    </div>
-                  </div>
-                )}
+                {/* Task 2: Replaced breakout box with clean single caption */}
+                <p className="mt-3 text-xs text-ink-secondary text-center font-medium">
+                  Two half-empty loads become one 91% full tanker.
+                </p>
               </div>
 
               {/* Economic Comparison Chart */}
@@ -200,12 +198,14 @@ export const MatchEnginePage: React.FC = () => {
                   Ranked Match Proposals ({matches.length})
                 </h3>
                 <span className="text-xs text-ink-muted">
-                  Ranked by Pareto Net Benefit
+                  Ranked by net benefit
                 </span>
               </div>
 
               {matches.map((opt) => {
                 const isSelected = selectedMatch?.id === opt.id;
+                const isNegative = opt.netBenefit < 0;
+
                 return (
                   <div
                     key={opt.id}
@@ -219,12 +219,19 @@ export const MatchEnginePage: React.FC = () => {
                     {/* Top Row: Title + Badges */}
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
-                        {opt.recommended && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-brand-600 text-white mb-2 shadow-sm">
-                            <Sparkles className="w-3 h-3 text-brand-200" />
-                            Best Bundle (AI Recommended)
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                          {opt.recommended && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-brand-600 text-white shadow-sm">
+                              <Sparkles className="w-3 h-3 text-brand-200" />
+                              Best Bundle
+                            </span>
+                          )}
+                          {isProvisional && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                              Provisional: pending lab test
+                            </span>
+                          )}
+                        </div>
                         <h4 className="text-sm font-bold text-ink-primary leading-snug">
                           {opt.title}
                         </h4>
@@ -246,11 +253,23 @@ export const MatchEnginePage: React.FC = () => {
 
                     {/* Metric Pills */}
                     <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
-                      <div className="p-2 rounded-xl bg-surface-subtle border border-surface-muted/60">
+                      {/* Net Benefit derived from economics.ts */}
+                      <div className={`p-2 rounded-xl border ${
+                        isNegative
+                          ? 'bg-red-50 border-red-200 text-status-error'
+                          : 'bg-surface-subtle border-surface-muted/60'
+                      }`}>
                         <span className="text-[10px] text-ink-muted block">Net Benefit</span>
-                        <span className="text-sm font-extrabold text-status-success font-display">
-                          +₹{opt.netBenefit.toLocaleString()}
+                        <span className={`text-sm font-extrabold font-display ${
+                          isNegative ? 'text-status-error' : 'text-status-success'
+                        }`}>
+                          {isNegative ? `−₹${Math.abs(opt.netBenefit).toLocaleString()}` : `+₹${opt.netBenefit.toLocaleString()}`}
                         </span>
+                        {isNegative && (
+                          <span className="text-[10px] text-red-700 block leading-tight mt-0.5 font-medium">
+                            Not viable alone: half-empty truck, long haul
+                          </span>
+                        )}
                       </div>
 
                       <div className="p-2 rounded-xl bg-surface-subtle border border-surface-muted/60">
@@ -271,16 +290,16 @@ export const MatchEnginePage: React.FC = () => {
                       </div>
 
                       <div className="p-2 rounded-xl bg-surface-subtle border border-surface-muted/60">
-                        <span className="text-[10px] text-ink-muted block">Regulatory Audit</span>
+                        <span className="text-[10px] text-ink-muted block">Rule Compliance</span>
                         <span className="text-xs font-bold text-ink-primary">
-                          {opt.rulesPassed} / {opt.rulesTotal} passed
+                          {opt.rulesPassed} of {opt.rulesTotal} applicable rules passed
                         </span>
                       </div>
 
                       <div className="p-2 rounded-xl bg-surface-subtle border border-surface-muted/60">
                         <span className="text-[10px] text-ink-muted block">Carbon Diverted</span>
                         <span className="text-xs font-bold text-emerald-700">
-                          {opt.co2SavedTonnes} t CO₂e
+                          {opt.co2SavedTonnes} t CO₂e (est.)
                         </span>
                       </div>
                     </div>
@@ -312,7 +331,7 @@ export const MatchEnginePage: React.FC = () => {
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-ink-secondary">Selected Configuration:</span>
                   <strong className="text-ink-primary font-bold">
-                    {selectedMatch?.title || 'Hero Bundle'}
+                    {selectedMatch?.title || 'Shared bundle to Aravali Cement Works'}
                   </strong>
                 </div>
 
@@ -321,7 +340,7 @@ export const MatchEnginePage: React.FC = () => {
                   className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm transition-all shadow-card hover:shadow-elevated active:scale-98"
                 >
                   <ShieldCheck className="w-4 h-4 text-brand-200" />
-                  <span>Accept Match & Lock Escrow</span>
+                  <span>{isProvisional ? 'Reserve match' : 'Accept match and lock escrow'}</span>
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </button>
 
@@ -343,4 +362,3 @@ export const MatchEnginePage: React.FC = () => {
     </div>
   );
 };
-

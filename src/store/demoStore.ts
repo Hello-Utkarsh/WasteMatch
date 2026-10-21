@@ -4,19 +4,21 @@ import {
   MatchOption,
   Deal,
   IngestedFile,
+  ReceiverProfile,
 } from '../mock/types';
 import {
   SAMPLE_INPUT_FILES,
   HERO_FINGERPRINT,
   HERO_MATCH_OPTIONS,
   HERO_INITIAL_DEAL,
+  RECEIVER_PROFILES,
 } from '../mock/data';
 import * as api from '../mock/api';
 
 export interface GuidedDemoState {
   isActive: boolean;
   isPaused: boolean;
-  stepIndex: number; // 0 to 6
+  stepIndex: number;
   caption: string;
 }
 
@@ -33,6 +35,8 @@ interface DemoStore {
   addSampleFiles: () => void;
   runAnalysis: () => Promise<void>;
   updateParameter: (key: string, value: number | string) => Promise<void>;
+  requestPartnerLab: () => Promise<void>;
+  simulateLabResult: () => Promise<void>;
 
   // Matching Engine State
   isSolving: boolean;
@@ -45,6 +49,11 @@ interface DemoStore {
   runOptimizer: () => Promise<void>;
   selectMatch: (match: MatchOption) => void;
 
+  // Receiver Registry
+  receiverProfiles: ReceiverProfile[];
+  loadReceiverProfiles: () => Promise<void>;
+  claimProfile: (id: string, email: string, limits?: ReceiverProfile['limits']) => Promise<void>;
+
   // Settlement Engine State
   deal: Deal;
   isDelivering: boolean;
@@ -53,7 +62,9 @@ interface DemoStore {
   setForceFailMode: (val: boolean) => void;
   simulateDeliveryTransit: () => Promise<void>;
   runVerificationCheck: () => Promise<void>;
-  releaseEscrowPayment: () => Promise<void>;
+  releaseStage1: () => Promise<void>;
+  simulateLabReport: () => Promise<void>;
+  releaseStage2: () => Promise<void>;
 
   // Guided Auto-Play Demo
   guidedDemo: GuidedDemoState;
@@ -99,6 +110,16 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
     set({ fingerprint: updated });
   },
 
+  requestPartnerLab: async () => {
+    const updated = await api.requestPartnerLabTest();
+    set({ fingerprint: updated });
+  },
+
+  simulateLabResult: async () => {
+    const updated = await api.simulateLabResult();
+    set({ fingerprint: updated });
+  },
+
   // Matching Engine
   isSolving: false,
   solverProgress: { label: 'Ready', pct: 0 },
@@ -109,7 +130,7 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
   setActiveMatchTab: (tab) => set({ activeMatchTab: tab }),
 
   runOptimizer: async () => {
-    set({ isSolving: true, solverProgress: { label: 'Initializing constraint solver...', pct: 10 } });
+    set({ isSolving: true, solverProgress: { label: 'Initializing CP-SAT constraint solver...', pct: 10 } });
     try {
       const opts = await api.runOptimizer(
         get().fingerprint?.id || 'fp-hero-01',
@@ -120,7 +141,7 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
         selectedMatch: opts[0],
         hasSolved: true,
         isSolving: false,
-        solverProgress: { label: 'Optimal match bundle synthesized', pct: 100 },
+        solverProgress: { label: 'Best feasible bundle found · 3 configurations evaluated', pct: 100 },
       });
     } catch {
       set({ isSolving: false });
@@ -129,6 +150,17 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
 
   selectMatch: (match: MatchOption) => {
     set({ selectedMatch: match });
+  },
+
+  // Receiver Registry
+  receiverProfiles: JSON.parse(JSON.stringify(RECEIVER_PROFILES)),
+  loadReceiverProfiles: async () => {
+    const list = await api.getReceiverProfiles();
+    set({ receiverProfiles: list });
+  },
+  claimProfile: async (id: string, email: string, limits?: ReceiverProfile['limits']) => {
+    const updated = await api.claimReceiverProfile(id, email, limits);
+    set({ receiverProfiles: updated });
   },
 
   // Settlement Engine
@@ -140,15 +172,13 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
 
   simulateDeliveryTransit: async () => {
     set({ isDelivering: true });
-    // Advance deal from Locked -> In transit -> Delivered
     await api.advanceDealStage('In transit');
     set((state) => ({ deal: { ...state.deal, stage: 'In transit' } }));
 
-    // Small delay to simulate road transit
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 900));
 
-    await api.advanceDealStage('Delivered');
-    set((state) => ({ deal: { ...state.deal, stage: 'Delivered' }, isDelivering: false }));
+    await api.advanceDealStage('Gate verified');
+    set((state) => ({ deal: { ...state.deal, stage: 'Gate verified' }, isDelivering: false }));
   },
 
   runVerificationCheck: async () => {
@@ -158,8 +188,18 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
     set({ deal: updated, isVerifying: false });
   },
 
-  releaseEscrowPayment: async () => {
-    const updated = await api.releaseEscrowFunds();
+  releaseStage1: async () => {
+    const updated = await api.releaseStage1Payment();
+    set({ deal: updated });
+  },
+
+  simulateLabReport: async () => {
+    const updated = await api.simulateLabReportPass();
+    set({ deal: updated });
+  },
+
+  releaseStage2: async () => {
+    const updated = await api.releaseStage2Payment();
     set({ deal: updated });
   },
 
@@ -225,6 +265,7 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
       matches: [],
       selectedMatch: null,
       activeMatchTab: 'generator',
+      receiverProfiles: JSON.parse(JSON.stringify(RECEIVER_PROFILES)),
       deal: JSON.parse(JSON.stringify(HERO_INITIAL_DEAL)),
       isDelivering: false,
       isVerifying: false,
@@ -238,4 +279,3 @@ export const useDemoStore = create<DemoStore>((set, get) => ({
     });
   },
 }));
-

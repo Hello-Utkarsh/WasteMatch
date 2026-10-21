@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Building2, AlertTriangle, ShieldCheck, TrendingUp, Layers } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Check, X, Building2, AlertTriangle, ShieldCheck, TrendingUp, Layers, ExternalLink } from 'lucide-react';
 import { ReceiverOfferItem } from '../../mock/data';
 import * as api from '../../mock/api';
 
@@ -36,7 +37,16 @@ export const ReceiverView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/receivers"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold text-xs border border-brand-200 transition-colors shadow-subtle"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Receiver Registry</span>
+            <ExternalLink className="w-3 h-3 ml-0.5" />
+          </Link>
+
           <div className="text-right">
             <div className="text-xs text-ink-muted">Monthly AFR Quota</div>
             <div className="text-sm font-bold text-ink-primary">318 / 450 Tonnes (71%)</div>

@@ -4,6 +4,7 @@ import {
   HERO_INITIAL_DEAL,
   SAMPLE_INPUT_FILES,
   ARAVALI_INCOMING_OFFERS,
+  RECEIVER_PROFILES,
   ReceiverOfferItem,
 } from './data';
 import {
@@ -11,6 +12,7 @@ import {
   MatchOption,
   Deal,
   IngestedFile,
+  ReceiverProfile,
 } from './types';
 
 // Helper for simulating async server latency
@@ -19,6 +21,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // In-memory mutable states for current session
 let currentFingerprint: WasteFingerprint = JSON.parse(JSON.stringify(HERO_FINGERPRINT));
 let currentOffers: ReceiverOfferItem[] = JSON.parse(JSON.stringify(ARAVALI_INCOMING_OFFERS));
+let currentProfiles: ReceiverProfile[] = JSON.parse(JSON.stringify(RECEIVER_PROFILES));
 let currentDeal: Deal = JSON.parse(JSON.stringify(HERO_INITIAL_DEAL));
 
 /**
@@ -48,10 +51,28 @@ export async function extractFingerprint(
     if (onProgress) {
       onProgress(step.label, step.pct);
     }
-    await delay(650);
+    await delay(500);
   }
 
   return JSON.parse(JSON.stringify(currentFingerprint));
+}
+
+/**
+ * Sets data completeness status to Provisional
+ */
+export async function requestPartnerLabTest(): Promise<WasteFingerprint> {
+  await delay(300);
+  currentFingerprint.status = 'Provisional';
+  return { ...currentFingerprint };
+}
+
+/**
+ * Simulates lab result arrival, flipping status to Confirmed
+ */
+export async function simulateLabResult(): Promise<WasteFingerprint> {
+  await delay(400);
+  currentFingerprint.status = 'Confirmed';
+  return { ...currentFingerprint };
 }
 
 /**
@@ -71,24 +92,24 @@ export async function updateFingerprintParam(
 }
 
 /**
- * Simulates the OR-Tools / Mixed Integer Linear Programming (MILP) solver
+ * CP-SAT Constraint Solver simulation
  */
 export async function runOptimizer(
   _wasteId: string,
   onStep?: (msg: string, progressPct: number) => void
 ): Promise<MatchOption[]> {
   const steps = [
-    { label: 'Querying geo-spatial receiver index within 500km radius...', pct: 25 },
-    { label: 'Evaluating EU BREF & CPCB co-processing compatibility constraints...', pct: 55 },
-    { label: 'Solving multi-depot vehicle routing & multi-party payload bundling...', pct: 85 },
-    { label: 'Calculating Pareto-optimal net economic & CO₂ savings frontier...', pct: 100 },
+    { label: 'Querying spatial receiver index within 1,000 km radius...', pct: 25 },
+    { label: 'Evaluating rule engine: sample rule set across CPCB & EU BREF...', pct: 55 },
+    { label: 'Solving multi-stop vehicle sequence (Muzaffarnagar → Ghaziabad → Nimbahera)...', pct: 85 },
+    { label: 'Best feasible bundle found · 3 configurations evaluated', pct: 100 },
   ];
 
   for (const step of steps) {
     if (onStep) {
       onStep(step.label, step.pct);
     }
-    await delay(700);
+    await delay(550);
   }
 
   return JSON.parse(JSON.stringify(HERO_MATCH_OPTIONS));
@@ -114,6 +135,40 @@ export async function getReceiverOffers(): Promise<ReceiverOfferItem[]> {
 }
 
 /**
+ * Receiver Registry (Task 5)
+ */
+export async function getReceiverProfiles(): Promise<ReceiverProfile[]> {
+  await delay(200);
+  return [...currentProfiles];
+}
+
+export async function claimReceiverProfile(
+  id: string,
+  email: string,
+  limits?: ReceiverProfile['limits']
+): Promise<ReceiverProfile[]> {
+  await delay(400);
+  currentProfiles = currentProfiles.map((p) => {
+    if (p.id === id) {
+      return {
+        ...p,
+        status: 'Verified',
+        contactEmail: email,
+        authorisationPdfAttached: true,
+        limits: limits || p.limits || {
+          chlorideMaxPct: 0.10,
+          minCalorificMjKg: 1.5,
+          metalLimitsPpm: 100,
+          acceptedHours: '08:00 - 20:00 Daily',
+        },
+      };
+    }
+    return p;
+  });
+  return [...currentProfiles];
+}
+
+/**
  * Settle Engine: initialize or fetch active escrow deal
  */
 export async function fetchCurrentDeal(): Promise<Deal> {
@@ -122,57 +177,59 @@ export async function fetchCurrentDeal(): Promise<Deal> {
 }
 
 export async function advanceDealStage(nextStage: Deal['stage']): Promise<Deal> {
-  await delay(400);
+  await delay(300);
   currentDeal.stage = nextStage;
   return JSON.parse(JSON.stringify(currentDeal));
 }
 
 /**
- * AI Test-Strip verification with optional fail condition
+ * Gate check verification (pH, chloride, density) with optional fail condition
  */
 export async function verifyDelivery(forceFail: boolean = false): Promise<Deal> {
-  await delay(1200);
+  await delay(800);
 
   if (forceFail) {
-    currentDeal.stage = 'Verifying';
+    currentDeal.stage = 'Gate verified';
+    currentDeal.disputeActive = true;
     currentDeal.verification = {
       result: 'FAIL',
-      timestamp: new Date().toLocaleTimeString() + ' IST',
+      timestamp: '22 Oct 2026, 02:15 IST',
       operator: 'Automated In-Line Sensor Array (Gate #4)',
-      rejectionReason: 'Chloride threshold exceeded batch limit (Measured 242,000 ppm vs Max 200,000 ppm). Potential corrosive hazard to pre-calciner kiln refractory.',
+      rejectionReason: 'Chloride threshold exceeded batch limit (Measured 242,000 ppm vs Max 200,000 ppm). Funds held. Re-test or return load.',
       checks: [
         {
-          name: 'pH Range (Extreme Acidic Compartment)',
+          name: 'pH Range (Acidic Compartment)',
           expected: 'pH 0.5 - 1.2',
           measured: 'pH 0.88',
           pass: true,
-          margin: 'Compliant',
+          margin: 'Within 5% variance tolerance',
         },
         {
           name: 'Chloride Max Cap (< 200,000 ppm)',
           expected: '< 200,000 ppm',
           measured: '242,000 ppm [ANOMALY]',
           pass: false,
-          margin: '+21% over safety threshold',
+          margin: 'Exceeds kiln acceptance limit',
         },
         {
-          name: 'Toxic Heavy Metals (Pb, Cd, Hg)',
-          expected: 'Pb < 10, Cd < 1, Hg < 0.1 ppm',
-          measured: 'Pb 4.6, Cd 0.11, Hg 0.01 ppm',
-          pass: true,
-          margin: 'Compliant',
-        },
-        {
-          name: 'Optical Density & Turbidity Signature',
+          name: 'Visual & Density Pattern Match',
           expected: 'Dark olive liquid (1.25 - 1.32 g/cm³)',
-          measured: 'Turbid dark amber, 1.34 g/cm³',
+          measured: 'Dark olive green, 1.282 g/cm³',
+          pass: true,
+          margin: 'Optical pattern match confirmed',
+        },
+        {
+          name: 'Trace Heavy Metals (Pb, Cd, Hg) — Lab ICP-OES',
+          expected: 'Pb < 10, Cd < 1, Hg < 0.1 ppm',
+          measured: 'Pending 24-48h analysis',
           pass: false,
-          margin: 'Density mismatch detected',
+          margin: 'Awaiting lab validation',
         },
       ],
     };
   } else {
-    currentDeal.stage = 'Verified';
+    currentDeal.stage = 'Gate verified';
+    currentDeal.disputeActive = false;
     currentDeal.verification = JSON.parse(JSON.stringify(HERO_INITIAL_DEAL.verification!));
   }
 
@@ -180,11 +237,40 @@ export async function verifyDelivery(forceFail: boolean = false): Promise<Deal> 
 }
 
 /**
- * Smart Contract Escrow Release
+ * Stage 1 Release: 80% (₹21,000) upon Gate Verification PASS
  */
-export async function releaseEscrowFunds(): Promise<Deal> {
-  await delay(800);
-  currentDeal.stage = 'Released';
+export async function releaseStage1Payment(): Promise<Deal> {
+  await delay(500);
+  currentDeal.stage1Released = true;
+  return JSON.parse(JSON.stringify(currentDeal));
+}
+
+/**
+ * Simulate 24-48h lab report completion
+ */
+export async function simulateLabReportPass(): Promise<Deal> {
+  await delay(600);
+  currentDeal.labReportStatus = 'passed';
+  if (currentDeal.verification) {
+    const metalCheck = currentDeal.verification.checks.find((c) =>
+      c.name.includes('Heavy Metals')
+    );
+    if (metalCheck) {
+      metalCheck.measured = 'Pb 4.6, Cd 0.11, Hg 0.01 ppm';
+      metalCheck.pass = true;
+      metalCheck.margin = 'All trace elements compliant';
+    }
+  }
+  return JSON.parse(JSON.stringify(currentDeal));
+}
+
+/**
+ * Stage 2 Release: 20% (₹5,250) upon Lab Report PASS
+ */
+export async function releaseStage2Payment(): Promise<Deal> {
+  await delay(500);
+  currentDeal.stage2Released = true;
+  currentDeal.stage = 'Funds released';
   return JSON.parse(JSON.stringify(currentDeal));
 }
 
@@ -194,6 +280,6 @@ export async function releaseEscrowFunds(): Promise<Deal> {
 export function resetDemoMockState() {
   currentFingerprint = JSON.parse(JSON.stringify(HERO_FINGERPRINT));
   currentOffers = JSON.parse(JSON.stringify(ARAVALI_INCOMING_OFFERS));
+  currentProfiles = JSON.parse(JSON.stringify(RECEIVER_PROFILES));
   currentDeal = JSON.parse(JSON.stringify(HERO_INITIAL_DEAL));
 }
-

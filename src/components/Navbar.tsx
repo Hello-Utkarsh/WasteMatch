@@ -37,7 +37,7 @@ export const Navbar: React.FC = () => {
       num: 3,
       title: 'Settle & Trust',
       path: '/settlement',
-      done: deal.stage === 'Released' || deal.stage === 'Verified',
+      done: deal.stage === 'Funds released' || deal.stage === 'Gate verified',
       active: location.pathname === '/settlement',
     },
   ];
@@ -65,9 +65,6 @@ export const Navbar: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-bold tracking-tight text-ink-primary font-display">
                   Waste<span className="text-brand-600">Match</span>
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-brand-100 text-brand-700">
-                  AI v1.4
                 </span>
               </div>
               <p className="text-[11px] text-ink-muted hidden sm:block -mt-0.5">

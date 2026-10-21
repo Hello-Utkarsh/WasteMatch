@@ -24,7 +24,32 @@ export interface WasteFingerprint {
   hazardClass: HazardClass;
   confidence: number;          // 0-1 overall extraction confidence
   params: Record<string, ParameterData>;
-  // 50 parameters total in the concept. Show ~12 key ones in UI, rest behind "View all 50".
+  status?: 'Confirmed' | 'Provisional';
+  completenessTier?: 'Tier 0' | 'Tier 1' | 'Tier 2';
+}
+
+export type ReceiverStatus = 'Unverified' | 'Claimed' | 'Verified';
+
+export interface ReceiverProfile {
+  id: string;
+  name: string;
+  city: string;
+  state: string;
+  lat: number;
+  lng: number;
+  industry: string;
+  authorisedCategories: string[];
+  monthlyCapacityTonnes: number;
+  sourceBadge: string; // e.g. "SPCB authorisation list (sample)"
+  status: ReceiverStatus;
+  limits?: {
+    chlorideMaxPct: number;
+    minCalorificMjKg: number;
+    metalLimitsPpm: number;
+    acceptedHours: string;
+  };
+  contactEmail?: string;
+  authorisationPdfAttached?: boolean;
 }
 
 export interface Party {
@@ -38,6 +63,7 @@ export interface Party {
   industry: string;
   capacityTonnesPerMonth?: number;
   acceptedMaterials?: string[];
+  status?: ReceiverStatus;
 }
 
 export interface RuleCheck {
@@ -66,19 +92,12 @@ export interface MatchOption {
   recommended: boolean;
   transitCostSavedInr?: number;
   bundledParties?: string[];
+  isViable?: boolean;
+  notes?: string;
+  formulaBreakdown?: string;
 }
 
-export type EscrowStage = 'Locked' | 'In transit' | 'Delivered' | 'Verifying' | 'Verified' | 'Released';
-
-export interface TelemetryPoint {
-  t: string;
-  lat: number;
-  lng: number;
-  tempC: number;
-  sealIntact: boolean;
-  locationName: string;
-  speedKmh?: number;
-}
+export type EscrowStage = 'Locked' | 'In transit' | 'Gate verified' | 'Funds released';
 
 export interface VerificationCheck {
   name: string;
@@ -114,7 +133,6 @@ export interface Deal {
   matchId: string;
   amountInr: number;
   stage: EscrowStage;
-  telemetry: TelemetryPoint[];
   verification?: VerificationResult;
   certificate?: CreditCertificate;
   contractAddress?: string;
@@ -125,6 +143,10 @@ export interface Deal {
   receiverName?: string;
   materialsSummary?: string;
   totalTonnes?: number;
+  stage1Released?: boolean;
+  stage2Released?: boolean;
+  labReportStatus?: 'pending' | 'passed' | 'failed';
+  disputeActive?: boolean;
 }
 
 export interface IngestedFile {
@@ -136,4 +158,3 @@ export interface IngestedFile {
   extractedSnippet: string;
   timestamp: string;
 }
-

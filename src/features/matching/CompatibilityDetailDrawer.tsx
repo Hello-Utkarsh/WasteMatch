@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle2, AlertTriangle, XCircle, ShieldCheck, ExternalLink } from 'lucide-react';
+import { X, CheckCircle2, AlertTriangle, XCircle, ShieldCheck, Calculator } from 'lucide-react';
 import { MatchOption } from '../../mock/types';
 
 interface CompatibilityDetailDrawerProps {
@@ -26,7 +26,7 @@ export const CompatibilityDetailDrawer: React.FC<CompatibilityDetailDrawerProps>
                 {match.compatibilityScore}% Compatibility
               </span>
               <span className="text-xs text-ink-muted">
-                {match.rulesPassed} of {match.rulesTotal} Regulatory Constraints Passed
+                {match.rulesPassed} of {match.rulesTotal} applicable rules passed
               </span>
             </div>
             <h2 className="text-xl font-bold text-ink-primary mt-1">
@@ -56,10 +56,35 @@ export const CompatibilityDetailDrawer: React.FC<CompatibilityDetailDrawerProps>
             <p className="text-xs text-ink-secondary mt-1">{match.description}</p>
           </div>
 
+          {/* Formula & Economics Box (Task 1) */}
+          <div className="p-4 rounded-2xl bg-brand-50/50 border border-brand-200">
+            <div className="flex items-center gap-2 text-xs font-bold text-brand-800 mb-2">
+              <Calculator className="w-4 h-4 text-brand-600" />
+              <span>Economic Derivation Formula</span>
+            </div>
+            <div className="bg-surface rounded-xl p-3 border border-brand-100 font-mono text-xs text-ink-primary mb-2">
+              <div className="text-ink-secondary mb-1">
+                netBenefit = (tonnes × BASELINE_DISPOSAL_PER_T) − (km × FREIGHT_PER_KM) + receiverPayment
+              </div>
+              <div className="text-ink-secondary">
+                truckFillPct = round(tonnes / TANKER_CAPACITY_T × 100)
+              </div>
+            </div>
+
+            {match.formulaBreakdown && (
+              <div className="text-xs font-semibold text-brand-900 mt-2">
+                Calculation: <span className="font-mono text-ink-primary">{match.formulaBreakdown}</span>
+              </div>
+            )}
+            <div className="mt-1 text-[11px] text-ink-muted">
+              *Receiver payment is negative when receiver charges an acceptance fee.
+            </div>
+          </div>
+
           {/* Rules Checked List */}
           <div className="space-y-3 pt-2">
             <h4 className="text-xs font-bold uppercase tracking-wider text-ink-secondary">
-              Audited Regulatory Standards ({match.rulesChecked.length} Sample Checks)
+              Audited Rules ({match.rulesPassed} of {match.rulesTotal} applicable rules passed)
             </h4>
 
             {match.rulesChecked.map((rule, idx) => {
@@ -117,7 +142,7 @@ export const CompatibilityDetailDrawer: React.FC<CompatibilityDetailDrawerProps>
         <div className="p-4 border-t border-surface-subtle bg-surface-subtle/50 flex items-center justify-between text-xs text-ink-secondary">
           <span className="flex items-center gap-1">
             <ShieldCheck className="w-4 h-4 text-status-success" />
-            <span>Deterministic Constraint Solver Validated</span>
+            <span>Rule Engine Clearance Verified</span>
           </span>
 
           <button
@@ -131,4 +156,3 @@ export const CompatibilityDetailDrawer: React.FC<CompatibilityDetailDrawerProps>
     </div>
   );
 };
-

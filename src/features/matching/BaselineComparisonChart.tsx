@@ -8,50 +8,34 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import {
+  HANDLING_COST_COMPARISON,
+  COMPARISON_CHART_CAPTION,
+  CO2_ESTIMATED_TONNES,
+} from '../../mock/economics';
 
 export const BaselineComparisonChart: React.FC = () => {
-  const data = [
-    {
-      name: 'Status Quo (TSDF Landfill)',
-      costOrBenefit: -84000,
-      label: '-₹84,000 (Disposal Cost Penalty)',
-      fill: '#DC2626',
-    },
-    {
-      name: 'Single Unbundled Trip',
-      costOrBenefit: 46000,
-      label: '+₹46,000 (52% Truckfill Penalty)',
-      fill: '#F59E0B',
-    },
-    {
-      name: 'WasteMatch Co-loaded Bundle',
-      costOrBenefit: 99000,
-      label: '+₹99,000 (92% Fill + Replaced Raw Meal)',
-      fill: '#15803D',
-    },
-  ];
-
   return (
     <div className="bg-surface rounded-2xl p-5 border border-surface-subtle shadow-card">
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-xs font-bold uppercase tracking-wider text-ink-secondary">
-          Economic Net Outcome Comparison (₹ per Batch)
+          Total Cost of Handling 21 t per Batch (₹, Negative = Cost)
         </h4>
         <span className="text-[11px] font-bold text-status-success">
-          +₹183,000 Total Swing
+          ₹40,550 Net Benefit vs Baseline
         </span>
       </div>
 
       <div className="h-44 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
-            data={data}
+            data={HANDLING_COST_COMPARISON}
             layout="vertical"
             margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
           >
             <XAxis
               type="number"
-              domain={[-90000, 110000]}
+              domain={[-100000, 0]}
               tickFormatter={(v) => `₹${Math.round(v / 1000)}k`}
               tick={{ fontSize: 10, fill: '#8C8785' }}
             />
@@ -64,7 +48,7 @@ export const BaselineComparisonChart: React.FC = () => {
             <Tooltip
               formatter={(val: number) => [
                 `₹${val.toLocaleString()}`,
-                val >= 0 ? 'Net Economic Gain' : 'Disposal Cost Liability',
+                'Net Batch Expense (after receiver payment)',
               ]}
               contentStyle={{
                 backgroundColor: '#1A1818',
@@ -73,8 +57,8 @@ export const BaselineComparisonChart: React.FC = () => {
                 fontSize: '12px',
               }}
             />
-            <Bar dataKey="costOrBenefit" radius={[0, 6, 6, 0]}>
-              {data.map((entry, index) => (
+            <Bar dataKey="costInr" radius={[0, 6, 6, 0]}>
+              {HANDLING_COST_COMPARISON.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Bar>
@@ -82,13 +66,12 @@ export const BaselineComparisonChart: React.FC = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-2 pt-2 border-t border-surface-subtle flex items-center justify-between text-[11px] text-ink-muted">
-        <span>Includes TSDF tipping fee, hazardous transport & receiver credit</span>
-        <span className="font-semibold text-status-success">
-          14.8 tonnes CO₂ avoided
+      <div className="mt-2 pt-2 border-t border-surface-subtle flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-ink-muted gap-1">
+        <span className="font-medium text-ink-secondary">{COMPARISON_CHART_CAPTION}</span>
+        <span className="font-semibold text-status-success whitespace-nowrap">
+          {CO2_ESTIMATED_TONNES} t CO₂e (estimated)
         </span>
       </div>
     </div>
   );
 };
-

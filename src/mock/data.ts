@@ -4,7 +4,13 @@ import {
   MatchOption,
   Deal,
   IngestedFile,
+  ReceiverProfile,
 } from './types';
+import {
+  DERIVED_MATCH_OPTIONS,
+  ESCROW_HERO_DEAL,
+  CO2_ESTIMATED_TONNES,
+} from './economics';
 
 // ==========================================
 // 1. GENERATOR & RECEIVER PARTIES
@@ -73,56 +79,157 @@ export const GENERATORS: Party[] = [
   },
 ];
 
-export const RECEIVERS: Party[] = [
+// 8 Fictional Receivers for Registry & SPCB Seed
+export const RECEIVER_PROFILES: ReceiverProfile[] = [
   {
     id: 'rec-1',
     name: 'Aravali Cement Works (Co-processing Kiln)',
-    type: 'receiver',
-    city: 'Nimbahera / Chittorgarh',
+    city: 'Nimbahera',
     state: 'Rajasthan',
     lat: 24.6225,
     lng: 74.6869,
     industry: 'Cement Clinker Manufacturing (Co-processing AFR)',
-    capacityTonnesPerMonth: 450,
-    acceptedMaterials: ['Spent acid', 'Alkaline sludge', 'Solid recovered fuel', 'High-calorific waste'],
+    authorisedCategories: ['Acidic Spent Liquor', 'Alkaline Sludge', 'Solid Recovered Fuel (SRF)', 'Paint Sludge'],
+    monthlyCapacityTonnes: 450,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Verified',
+    limits: {
+      chlorideMaxPct: 0.10,
+      minCalorificMjKg: 1.5,
+      metalLimitsPpm: 100,
+      acceptedHours: '06:00 - 22:00 Daily',
+    },
+    contactEmail: 'afr-intake@aravalicement.demo',
+    authorisationPdfAttached: true,
   },
   {
     id: 'rec-2',
     name: 'GreenBrick Eco-Industries',
-    type: 'receiver',
     city: 'Meerut',
     state: 'Uttar Pradesh',
     lat: 28.9845,
     lng: 77.7064,
     industry: 'Fly Ash & Geopolymer Bricks Manufacturing',
-    capacityTonnesPerMonth: 120,
-    acceptedMaterials: ['Foundry sand', 'Inorganic industrial sludge', 'Fly ash'],
+    authorisedCategories: ['Foundry Sand', 'Inorganic Industrial Sludge', 'Fly Ash'],
+    monthlyCapacityTonnes: 120,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Claimed',
+    limits: {
+      chlorideMaxPct: 0.05,
+      minCalorificMjKg: 0.0,
+      metalLimitsPpm: 50,
+      acceptedHours: '08:00 - 18:00 Mon-Sat',
+    },
+    contactEmail: 'operations@greenbrick.demo',
+    authorisationPdfAttached: true,
   },
   {
     id: 'rec-3',
     name: 'EcoPoly Advanced Recyclers',
-    type: 'receiver',
     city: 'Rewari',
     state: 'Haryana',
     lat: 28.1834,
     lng: 76.6191,
     industry: 'Mechanical & Chemical Polymer Compounding',
-    capacityTonnesPerMonth: 80,
-    acceptedMaterials: ['HDPE/PP Rigid scrap', 'Clean post-industrial polymer purge'],
+    authorisedCategories: ['HDPE/PP Rigid Scrap', 'Industrial Polymer Purge'],
+    monthlyCapacityTonnes: 80,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Claimed',
+    limits: {
+      chlorideMaxPct: 0.01,
+      minCalorificMjKg: 30.0,
+      metalLimitsPpm: 10,
+      acceptedHours: '24/7 Gate Delivery',
+    },
+    contactEmail: 'rawmaterials@ecopoly.demo',
+    authorisationPdfAttached: true,
   },
   {
     id: 'rec-4',
     name: 'NeutraChem Solutions',
-    type: 'receiver',
-    city: 'Ankleshwar / Dahej',
+    city: 'Dahej',
     state: 'Gujarat',
     lat: 21.6264,
     lng: 73.0152,
     industry: 'Hydrochloric Acid Regeneration & Ferric Chloride Synthesis',
-    capacityTonnesPerMonth: 200,
-    acceptedMaterials: ['Spent pickle liquor', 'Ferrous chloride solution'],
+    authorisedCategories: ['Spent Pickle Liquor (HCl)', 'Ferrous Chloride Solution'],
+    monthlyCapacityTonnes: 200,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Unverified',
+    limits: {
+      chlorideMaxPct: 22.0,
+      minCalorificMjKg: 0.0,
+      metalLimitsPpm: 500,
+      acceptedHours: '09:00 - 18:00 Mon-Fri',
+    },
+  },
+  {
+    id: 'rec-5',
+    name: 'Marwar Calcining & Clinker Ltd.',
+    city: 'Beawar',
+    state: 'Rajasthan',
+    lat: 26.1013,
+    lng: 74.3218,
+    industry: 'Lime & Secondary Clinker Burning',
+    authorisedCategories: ['Spent Solvents', 'Carbon Black Slurry', 'High-CV Plastic Fluff'],
+    monthlyCapacityTonnes: 320,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Unverified',
+  },
+  {
+    id: 'rec-6',
+    name: 'IndoSolv Recovery & Distillation',
+    city: 'Greater Noida',
+    state: 'Uttar Pradesh',
+    lat: 28.4744,
+    lng: 77.5040,
+    industry: 'Spent Solvent Fractional Distillation',
+    authorisedCategories: ['Contaminated Thinners', 'Isopropanol Wash', 'Spent Toluene'],
+    monthlyCapacityTonnes: 90,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Claimed',
+  },
+  {
+    id: 'rec-7',
+    name: 'Apex Hazardous Waste TSDF',
+    city: 'Pithampur',
+    state: 'Madhya Pradesh',
+    lat: 22.6142,
+    lng: 75.6822,
+    industry: 'Centralized Hazmat Treatment & Stabilization',
+    authorisedCategories: ['Heavy Metal Sludge', 'Organic Incinerable Waste', 'Contaminated Ash'],
+    monthlyCapacityTonnes: 600,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Verified',
+  },
+  {
+    id: 'rec-8',
+    name: 'Pragati Pre-Processors & AFR Blending',
+    city: 'Alwar',
+    state: 'Rajasthan',
+    lat: 27.5530,
+    lng: 76.6346,
+    industry: 'Refuse Derived Fuel (RDF) & Hazmat Co-processing Pre-treatment',
+    authorisedCategories: ['Multi-stream Hazardous Sludges', 'Automotive Paint Sludge', 'Textile ETP Cake'],
+    monthlyCapacityTonnes: 280,
+    sourceBadge: 'SPCB authorisation list (sample)',
+    status: 'Unverified',
   },
 ];
+
+export const RECEIVERS: Party[] = RECEIVER_PROFILES.map((p) => ({
+  id: p.id,
+  name: p.name,
+  type: 'receiver',
+  city: p.city,
+  state: p.state,
+  lat: p.lat,
+  lng: p.lng,
+  industry: p.industry,
+  capacityTonnesPerMonth: p.monthlyCapacityTonnes,
+  acceptedMaterials: p.authorisedCategories,
+  status: p.status,
+}));
 
 // ==========================================
 // 2. HERO SAMPLE INGESTION FILES
@@ -179,8 +286,9 @@ export const HERO_FINGERPRINT: WasteFingerprint = {
   physicalState: 'Liquid',
   hazardClass: 'Corrosive',
   confidence: 0.94,
+  status: 'Confirmed',
+  completenessTier: 'Tier 1',
   params: {
-    // 12 Key Parameters shown on primary dashboard
     pH: {
       name: 'pH Level',
       category: 'Physicochemical',
@@ -239,7 +347,7 @@ export const HERO_FINGERPRINT: WasteFingerprint = {
       confidence: 0.74,
       source: 'nir_scan',
       benchmark: '< 1,200 ppm (Galv dragout)',
-      isFlagged: true, // Human-in-the-loop verify demo
+      isFlagged: true,
     },
     pb: {
       name: 'Lead (Pb)',
@@ -301,8 +409,6 @@ export const HERO_FINGERPRINT: WasteFingerprint = {
       benchmark: 'CPCB HazCat Schedule I #26.1',
       isFlagged: false,
     },
-
-    // Remaining parameters completing the 50-parameter fingerprint
     freeHcl: { name: 'Free Hydrochloric Acid', category: 'Physicochemical', value: 4.8, unit: '% w/w', confidence: 0.96, source: 'lab_pdf', benchmark: '3 - 7%' },
     totalDissolvedSolids: { name: 'Total Dissolved Solids (TDS)', category: 'Physicochemical', value: 312000, unit: 'ppm', confidence: 0.93, source: 'lab_pdf', benchmark: '< 350,000 ppm' },
     totalSuspendedSolids: { name: 'Total Suspended Solids (TSS)', category: 'Physicochemical', value: 450, unit: 'ppm', confidence: 0.85, source: 'photo', benchmark: '< 1000 ppm' },
@@ -326,7 +432,7 @@ export const HERO_FINGERPRINT: WasteFingerprint = {
     toc: { name: 'Total Organic Carbon (TOC)', category: 'Combustion / Co-Processing', value: 180, unit: 'ppm', confidence: 0.89, source: 'lab_pdf', benchmark: '< 500 ppm' },
     cod: { name: 'Chemical Oxygen Demand (COD)', category: 'Combustion / Co-Processing', value: 620, unit: 'mg/L', confidence: 0.87, source: 'lab_pdf', benchmark: '< 1500 mg/L' },
     bod: { name: 'Biochemical Oxygen Demand (BOD5)', category: 'Combustion / Co-Processing', value: 45, unit: 'mg/L', confidence: 0.82, source: 'lab_pdf', benchmark: '< 100 mg/L' },
-    ashContent: { name: 'Inorganic Ash Residue @ 850°C', category: 'Combustion / Co-Processing', value: 14.8, unit: '% w/w', confidence: 0.93, source: 'lab_pdf', benchmark: '12 - 18%' },
+    ashContent: { name: 'Inorganic Ash Residue @ 850°C', category: 'Combustion / Co-Processing', value: 15.2, unit: '% w/w', confidence: 0.93, source: 'lab_pdf', benchmark: '12 - 18%' },
     volatileMatter: { name: 'Volatile Compounds', category: 'Combustion / Co-Processing', value: 16.8, unit: '% w/w', confidence: 0.90, source: 'nir_scan', benchmark: '15 - 20%' },
     sulfurTotal: { name: 'Total Sulfur (S)', category: 'Combustion / Co-Processing', value: 0.04, unit: '%', confidence: 0.92, source: 'lab_pdf', benchmark: '< 0.5% kiln limit' },
     fluorine: { name: 'Total Fluorine (F⁻)', category: 'Combustion / Co-Processing', value: 14, unit: 'ppm', confidence: 0.89, source: 'lab_pdf', benchmark: '< 50 ppm kiln limit' },
@@ -345,28 +451,35 @@ export const HERO_FINGERPRINT: WasteFingerprint = {
 };
 
 // ==========================================
-// 4. MATCH OPTIONS (Generated by Optimizer)
+// 4. MATCH OPTIONS (Derived from economics.ts)
 // ==========================================
 
+const opt1 = DERIVED_MATCH_OPTIONS[0]; // Shared bundle
+const opt3 = DERIVED_MATCH_OPTIONS[1]; // GreenBrick Meerut
+const opt2 = DERIVED_MATCH_OPTIONS[2]; // NeutraChem
+
 export const HERO_MATCH_OPTIONS: MatchOption[] = [
+  // 1. Shared bundle to Aravali Cement Works (Muzaffarnagar -> Ghaziabad -> kiln)
   {
-    id: 'match-opt-1',
-    receiverId: 'rec-1', // Aravali Cement Works
+    id: opt1.id,
+    receiverId: 'rec-1',
     wasteIds: ['fp-hero-01', 'gen-2-waste-alkali'],
-    title: 'Multi-Generator Shared Hazmat Bundle (Recommended)',
-    description: 'Joint freight: 12t acidic pickle liquor (Shree Ganesh) + 9t alkaline caustic sludge (Bharat Paper) in compartmentalized ADR tanker to Aravali Cement co-processing kiln.',
+    title: opt1.title,
+    description: 'Muzaffarnagar → Ghaziabad → kiln (two segregated compartments or two ADR vehicles on one milk-run).',
     compatibilityScore: 94,
-    rulesPassed: 487,
-    rulesTotal: 500,
-    distanceKm: 420,
-    truckFillPct: 92, // 21 tonnes / 23 tonne tanker capacity
-    revenuePerTonne: 1250, // Positive revenue paid by cement plant for iron & mineral source
-    disposalCostAvoided: 84000, // ₹7,000/t standard hazardous landfill fee avoided
-    netBenefit: 99000, // ₹15,000 net revenue + ₹84,000 disposal avoided
-    co2SavedTonnes: 14.8,
+    rulesPassed: 6,
+    rulesTotal: 6,
+    distanceKm: opt1.distanceKm, // 820 km (verify on Google Maps)
+    truckFillPct: opt1.truckFillPct, // 91%
+    revenuePerTonne: opt1.receiverPaymentPerTonne, // 1250
+    disposalCostAvoided: opt1.disposalCostAvoidedTotal, // 84000
+    netBenefit: opt1.netBenefit, // 40550
+    co2SavedTonnes: CO2_ESTIMATED_TONNES, // 1.6 t CO2e (estimated)
     recommended: true,
-    transitCostSavedInr: 32000,
-    bundledParties: ['Shree Ganesh Galvanizers (Ghaziabad)', 'Bharat Paper & Board (Muzaffarnagar)'],
+    isViable: true,
+    notes: opt1.notes,
+    bundledParties: opt1.parties,
+    formulaBreakdown: '(21 t × ₹4,000 baseline disposal avoided) − (820 km × ₹85 freight) + (21 t × ₹1,250 receiver payment) = ₹40,550 net benefit',
     rulesChecked: [
       {
         rule: 'EU BREF (Cement & Lime): Raw Material Clinker Substitute',
@@ -383,14 +496,14 @@ export const HERO_MATCH_OPTIONS: MatchOption[] = [
       {
         rule: 'Kiln Chloride Loading Constraint (< 0.10% total feed)',
         source: 'CPCB',
-        status: 'warn',
-        note: 'Chloride is elevated (18.2%); safe when blended with high-alkaline sludge buffer and bypass fan operating at 15%.',
+        status: 'pass',
+        note: 'Chloride is within safe envelope when blended with high-alkaline sludge buffer.',
       },
       {
-        rule: 'Dual Compartment Hazmat Transport (Petroleum and Explosives Safety Rules)',
+        rule: 'Segregated Compartment Hazmat Transport (PESO Safety Rules)',
         source: 'CPCB',
         status: 'pass',
-        note: 'AIS-028 certified segregated dual-vessel road tanker prevents cross-mixing during transit.',
+        note: 'Two segregated compartments prevent cross-mixing during transit.',
       },
       {
         rule: 'EPA RCRA Waste Minimization / Subpart CC Volatiles Standards',
@@ -406,69 +519,34 @@ export const HERO_MATCH_OPTIONS: MatchOption[] = [
       },
     ],
   },
+
+  // 2. Local neutralization at GreenBrick Meerut (12 t, acid only)
   {
-    id: 'match-opt-2',
-    receiverId: 'rec-4', // NeutraChem Solutions
+    id: opt3.id,
+    receiverId: 'rec-2',
     wasteIds: ['fp-hero-01'],
-    title: 'Direct Single-Trip Acid Recovery',
-    description: 'Dedicated single tanker to NeutraChem Solutions in Gujarat for FeCl₃ coagulant synthesis. Higher distance and half-empty truck penalty.',
-    compatibilityScore: 82,
-    rulesPassed: 462,
-    rulesTotal: 500,
-    distanceKm: 890,
-    truckFillPct: 52, // 12t on a 23t tanker
-    revenuePerTonne: 1800,
-    disposalCostAvoided: 84000,
-    netBenefit: 46000, // Reduced due to massive freight cost of ₹59,600
-    co2SavedTonnes: 7.2,
-    recommended: false,
-    transitCostSavedInr: 0,
-    bundledParties: ['Shree Ganesh Galvanizers only'],
-    rulesChecked: [
-      {
-        rule: 'Chemical Re-synthesis Assay Fe Level (> 100,000 ppm)',
-        source: 'CPCB',
-        status: 'pass',
-        note: 'Ideal Fe content for ferric chloride coagulant conversion.',
-      },
-      {
-        rule: 'Interstate Hazmat Transit Transit Permit (MoEFCC Schedule III)',
-        source: 'CPCB',
-        status: 'warn',
-        note: 'Requires 3 interstate transit clearances (UP -> Haryana -> Rajasthan -> Gujarat). Transit time ~48h.',
-      },
-      {
-        rule: 'Freight Logistics Efficiency Factor',
-        source: 'EPA',
-        status: 'warn',
-        note: 'Deadhead / half-capacity penalty: 48% unutilized container space increases per-tonne freight footprint.',
-      },
-    ],
-  },
-  {
-    id: 'match-opt-3',
-    receiverId: 'rec-2', // GreenBrick Industries
-    wasteIds: ['fp-hero-01'],
-    title: 'Neutralization for Fly Ash Geopolymer Matrix',
-    description: 'Local dispatch to GreenBrick Meerut for acid neutralization and metal immobilization in non-structural precast pavers.',
+    title: opt3.title,
+    description: opt3.subtitle,
     compatibilityScore: 68,
-    rulesPassed: 412,
-    rulesTotal: 500,
-    distanceKm: 65,
-    truckFillPct: 52,
-    revenuePerTonne: -800, // Disposal fee paid to brick plant, but cheaper than TSDF
-    disposalCostAvoided: 84000,
-    netBenefit: 38400,
-    co2SavedTonnes: 4.1,
+    rulesPassed: 3,
+    rulesTotal: 3,
+    distanceKm: opt3.distanceKm, // 65 km (verify on Google Maps)
+    truckFillPct: opt3.truckFillPct, // 52%
+    revenuePerTonne: opt3.receiverPaymentPerTonne, // -3000
+    disposalCostAvoided: opt3.disposalCostAvoidedTotal, // 48000
+    netBenefit: opt3.netBenefit, // 6475
+    co2SavedTonnes: CO2_ESTIMATED_TONNES,
     recommended: false,
-    transitCostSavedInr: 12000,
-    bundledParties: ['Shree Ganesh Galvanizers only'],
+    isViable: true,
+    notes: opt3.notes,
+    bundledParties: opt3.parties,
+    formulaBreakdown: '(12 t × ₹4,000 baseline disposal avoided) − (65 km × ₹85 freight) − (12 t × ₹3,000 acceptance fee) = ₹6,475 net benefit',
     rulesChecked: [
       {
         rule: 'CPCB TCLP Leaching Toxicity Test for Construction Products',
         source: 'CPCB',
-        status: 'warn',
-        note: 'Requires 4:1 lime stoichiometric buffering to prevent leaching in outdoor rain exposure.',
+        status: 'pass',
+        note: 'Requires stoichiometric lime buffering to prevent leaching in outdoor rain exposure.',
       },
       {
         rule: 'Heavy Metal Immobilization In Silicate Matrix',
@@ -477,10 +555,53 @@ export const HERO_MATCH_OPTIONS: MatchOption[] = [
         note: 'Meets non-load bearing compressive strength criteria (Class 7.5 MPa).',
       },
       {
-        rule: 'Odor & Corrosivity Handling on Open Yard',
+        rule: 'Local Air Quality Regulations (UPPCB Meerut Industrial Cluster)',
+        source: 'CPCB',
+        status: 'pass',
+        note: 'Wet scrubber operates within emission parameters.',
+      },
+    ],
+  },
+
+  // 3. Direct acid route to NeutraChem (12 t, acid only)
+  {
+    id: opt2.id,
+    receiverId: 'rec-4',
+    wasteIds: ['fp-hero-01'],
+    title: opt2.title,
+    description: opt2.subtitle,
+    compatibilityScore: 82,
+    rulesPassed: 3,
+    rulesTotal: 3,
+    distanceKm: opt2.distanceKm, // 890 km (verify on Google Maps)
+    truckFillPct: opt2.truckFillPct, // 52%
+    revenuePerTonne: opt2.receiverPaymentPerTonne, // 1500
+    disposalCostAvoided: opt2.disposalCostAvoidedTotal, // 48000
+    netBenefit: opt2.netBenefit, // -9650
+    co2SavedTonnes: CO2_ESTIMATED_TONNES,
+    recommended: false,
+    isViable: false,
+    notes: opt2.notes,
+    bundledParties: opt2.parties,
+    formulaBreakdown: '(12 t × ₹4,000 baseline disposal avoided) − (890 km × ₹85 freight) + (12 t × ₹1,500 receiver payment) = −₹9,650 (unviable alone)',
+    rulesChecked: [
+      {
+        rule: 'Chemical Re-synthesis Assay Fe Level (> 100,000 ppm)',
+        source: 'CPCB',
+        status: 'pass',
+        note: 'Ideal Fe content for ferric chloride coagulant conversion.',
+      },
+      {
+        rule: 'Interstate Hazmat Transit Clearance (MoEFCC Schedule III)',
+        source: 'CPCB',
+        status: 'pass',
+        note: 'Compliant with interstate transit documentation.',
+      },
+      {
+        rule: 'Minimum Freight Fill Threshold (Economic Viability Constraint)',
         source: 'EPA',
-        status: 'fail',
-        note: 'Receiver does not possess automated closed scrubber venting for tank unloading.',
+        status: 'warn',
+        note: 'Deadhead / half-capacity penalty: 48% unutilized container space makes single run economically negative.',
       },
     ],
   },
@@ -508,16 +629,16 @@ export interface ReceiverOfferItem {
 export const ARAVALI_INCOMING_OFFERS: ReceiverOfferItem[] = [
   {
     id: 'off-101',
-    sourceCompany: 'Shree Ganesh + Bharat Paper (Bundled)',
-    location: 'Ghaziabad + Muzaffarnagar, UP',
-    material: 'Spent Pickle Liquor + Caustic Sludge Bundle',
+    sourceCompany: 'Bharat Paper + Shree Ganesh (Bundled)',
+    location: 'Muzaffarnagar + Ghaziabad, UP',
+    material: 'Alkaline Sludge + Spent Pickle Liquor Bundle',
     tonnes: 21.0,
-    hazardClass: 'Class 8 (Dual Hazmat)',
+    hazardClass: 'Class 8 (Two Segregated Compartments)',
     compatibility: 94,
     pricePerTonneInr: 1250,
-    eta: 'Tomorrow, 16:00',
+    eta: '22 Oct, 02:00', // Matches arrival time!
     status: 'Pending',
-    chloridePpm: 104000, // Averaged post-bundle
+    chloridePpm: 104000,
     calorificMjKg: 1.8,
   },
   {
@@ -532,7 +653,7 @@ export const ARAVALI_INCOMING_OFFERS: ReceiverOfferItem[] = [
     eta: '24 Oct 2026',
     status: 'Pending',
     chloridePpm: 24000,
-    calorificMjKg: 14.2, // Good secondary fuel
+    calorificMjKg: 14.2,
   },
   {
     id: 'off-103',
@@ -546,7 +667,7 @@ export const ARAVALI_INCOMING_OFFERS: ReceiverOfferItem[] = [
     eta: '25 Oct 2026',
     status: 'Accepted',
     chloridePpm: 1200,
-    calorificMjKg: 36.5, // High calorific AFR
+    calorificMjKg: 36.5,
   },
   {
     id: 'off-104',
@@ -565,85 +686,33 @@ export const ARAVALI_INCOMING_OFFERS: ReceiverOfferItem[] = [
 ];
 
 // ==========================================
-// 6. HERO DEAL & TELEMETRY (Screen 3: Settle)
+// 6. HERO DEAL (Screen 3: Settle)
 // ==========================================
 
 export const HERO_INITIAL_DEAL: Deal = {
   id: 'DEAL-WM-2026-9042',
   matchId: 'match-opt-1',
-  amountInr: 99000,
+  amountInr: ESCROW_HERO_DEAL.totalAmountInr, // ₹26,250
   stage: 'Locked',
   contractAddress: '0x882E...79bA',
-  chainName: 'Base Sepolia (Testnet, Simulated)',
-  escrowLockedAt: '21 Oct 2026, 11:42 IST',
-  generatorName: 'Shree Ganesh Galvanizers',
-  partnerGeneratorName: 'Bharat Paper & Board Mills',
-  receiverName: 'Aravali Cement Works (Kiln #3)',
-  materialsSummary: 'Bundled Acidic Pickle Liquor (12t) + Alkaline Sludge (9t)',
+  chainName: 'testnet (simulated)',
+  escrowLockedAt: '21 Oct 2026, 08:00 IST',
+  generatorName: 'Shree Ganesh Galvanizers (Ghaziabad)',
+  partnerGeneratorName: 'Bharat Paper & Board Mills (Muzaffarnagar)',
+  receiverName: 'Aravali Cement Works (Kiln #3, Nimbahera)',
+  materialsSummary: 'Bundled Caustic Sludge (9t) + Acidic Pickle Liquor (12t)',
   totalTonnes: 21.0,
-  telemetry: [
-    {
-      t: '11:45 IST',
-      lat: 28.6692,
-      lng: 77.4538,
-      tempC: 28.4,
-      sealIntact: true,
-      locationName: 'Dispatched: Shree Ganesh Yard, Ghaziabad',
-      speedKmh: 0,
-    },
-    {
-      t: '13:30 IST',
-      lat: 29.4727,
-      lng: 77.7085,
-      tempC: 29.8,
-      sealIntact: true,
-      locationName: 'Co-loading: Bharat Paper Mills, Muzaffarnagar',
-      speedKmh: 0,
-    },
-    {
-      t: '15:15 IST',
-      lat: 28.3245,
-      lng: 76.9821,
-      tempC: 31.0,
-      sealIntact: true,
-      locationName: 'Delhi-Mumbai Expressway Toll km 42',
-      speedKmh: 64,
-    },
-    {
-      t: '18:40 IST',
-      lat: 26.9124,
-      lng: 75.7873,
-      tempC: 30.5,
-      sealIntact: true,
-      locationName: 'Jaipur Outer Ring Road Waypoint',
-      speedKmh: 68,
-    },
-    {
-      t: '22:10 IST',
-      lat: 25.3407,
-      lng: 74.6313,
-      tempC: 29.1,
-      sealIntact: true,
-      locationName: 'Bhilwara Fuel & Safety Inspection Check',
-      speedKmh: 58,
-    },
-    {
-      t: '01:25 IST',
-      lat: 24.6225,
-      lng: 74.6869,
-      tempC: 28.2,
-      sealIntact: true,
-      locationName: 'Arrival Gate #4: Aravali Cement Works, Nimbahera',
-      speedKmh: 0,
-    },
-  ],
+  stage1Released: false,
+  stage2Released: false,
+  labReportStatus: 'pending',
+  disputeActive: false,
   verification: {
     result: 'PASS',
-    timestamp: '22 Oct 2026, 01:45 IST',
+    timestamp: '22 Oct 2026, 02:15 IST',
     operator: 'N. Sharma (Chief Chemist, Kiln QA/QC)',
     checks: [
       {
-        name: 'pH Range (Extreme Acidic Compartment)',
+        name: 'pH Range (Acidic Compartment)',
         expected: 'pH 0.5 - 1.2',
         measured: 'pH 0.88',
         pass: true,
@@ -654,21 +723,21 @@ export const HERO_INITIAL_DEAL: Deal = {
         expected: '< 200,000 ppm',
         measured: '179,400 ppm',
         pass: true,
-        margin: '10.3% safety margin below limit',
+        margin: 'Within kiln acceptance limits',
       },
       {
-        name: 'Toxic Metal Contaminant Screening (Pb, Cd, Hg)',
+        name: 'Visual & Density Pattern Match',
+        expected: 'Dark olive liquid (1.25 - 1.32 g/cm³)',
+        measured: 'Dark olive green, 1.282 g/cm³',
+        pass: true,
+        margin: 'Optical pattern match confirmed',
+      },
+      {
+        name: 'Trace Heavy Metals (Pb, Cd, Hg) — Lab ICP-OES',
         expected: 'Pb < 10, Cd < 1, Hg < 0.1 ppm',
         measured: 'Pb 4.6, Cd 0.11, Hg 0.01 ppm',
         pass: true,
         margin: 'All trace elements compliant',
-      },
-      {
-        name: 'AI Spectrophotometric & Visual Density Match',
-        expected: 'Dark greenish liquid (1.25 - 1.32 g/cm³)',
-        measured: 'Dark olive green, 1.282 g/cm³',
-        pass: true,
-        margin: '99.1% optical pattern match',
       },
     ],
   },
@@ -676,13 +745,12 @@ export const HERO_INITIAL_DEAL: Deal = {
     id: 'CERT-WM-CO2-2026-8842',
     type: 'Carbon',
     tonnes: 21.0,
-    standard: 'Verra VCS / Gold Standard Aligned Industrial Symbiosis Metric',
-    issuedAt: '22 Oct 2026, 01:50 IST',
+    standard: 'Verra-methodology-aligned estimate, not an issued credit.',
+    issuedAt: '22 Oct 2026, 02:30 IST',
     txHash: '0x4f92c7104b28d7120a48b919d381023a9d77e481c7e92384a8b7c938472910fa',
-    issuer: 'WasteMatch Autonomous Settlement Protocol (v1.4)',
+    issuer: 'WasteMatch Settlement Engine',
     beneficiary: 'Shree Ganesh Galvanizers & Aravali Cement Co.',
-    co2eAvoidedTonnes: 14.8,
+    co2eAvoidedTonnes: CO2_ESTIMATED_TONNES,
     registryUrl: 'https://registry.wastematch.io/cert/WM-CO2-2026-8842',
   },
 };
-
