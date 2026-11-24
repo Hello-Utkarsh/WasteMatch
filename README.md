@@ -6,7 +6,7 @@ WasteMatch is an AI-powered industrial symbiosis engine designed to turn hazardo
 
 ---
 
-## 🚀 Live Demo Architecture
+## Live Demo Architecture
 
 ### The Problem
 - **₹252 Lakh Crore / year** in chemical and industrial byproducts are dumped into landfills in India.
@@ -37,7 +37,7 @@ WasteMatch is an AI-powered industrial symbiosis engine designed to turn hazardo
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework**: React 18 + TypeScript + Vite
 - **Styling**: Tailwind CSS + Custom Industrial-Fintech tokens (Brand Red `#D1343A`, `#A81818`, `#F8F6F5`)
@@ -49,7 +49,7 @@ WasteMatch is an AI-powered industrial symbiosis engine designed to turn hazardo
 
 ---
 
-## 📋 What is Real vs. What is Simulated
+## What is Real vs. What is Simulated
 
 | Feature | Current Prototype (Demo Mode) | Production Roadmap |
 | :--- | :--- | :--- |
@@ -61,7 +61,7 @@ WasteMatch is an AI-powered industrial symbiosis engine designed to turn hazardo
 
 ---
 
-## 🔌 Connecting a Real Backend
+## Connecting a Real Backend
 
 All simulated asynchronous behavior is cleanly abstracted behind the `src/mock/api.ts` layer. To plug into a real backend (e.g. FastAPI / Python OR-Tools solver):
 1. Keep the data types in `src/mock/types.ts`.
@@ -70,7 +70,7 @@ All simulated asynchronous behavior is cleanly abstracted behind the `src/mock/a
 
 ---
 
-## 🏃 Running Locally
+## Running Locally
 
 ```bash
 # Clone repository
@@ -94,7 +94,7 @@ npm run preview
 
 ---
 
-## 🎬 Live Demo Script (3 to 4 Minutes)
+## Live Demo Script (3 to 4 Minutes)
 
 1. **Problem (0:00 - 0:30)**: Start on `/`. Highlight the ₹252 Lakh Crore annual waste loss and the 85% partial truckload rejection barrier for Indian SMEs.
 2. **Fingerprint (0:30 - 1:15)**: Click "Start Interactive Demo". Load sample files and run analysis. Point out the Data Completeness Strip (Tier 1 on-site checks, tests needed: chloride titration & zinc XRF). Show human-in-the-loop verify and the 50-parameter passport.
